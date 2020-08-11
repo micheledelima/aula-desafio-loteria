@@ -1,25 +1,23 @@
       $set sourceformat"free"
-      *>Divisão de identificação do programa
+      *>DivisÃ£o de identificaÃ§Ã£o do programa
        Identification Division.
-       Program-id. "desafio2prog2".
+       Program-id. "jogo_loteria".
        Author. "Michele de Lima.
        Installation. "PC".
        Date-written. 21/07/2020.
-       Date-compiled. 01/08/2020.
+       Date-compiled. 11/08/2020.
 
-
-
-      *>Divisão para configuração do ambiente
+      *>DivisÃ£o para configuraÃ§Ã£o do ambiente
        Environment Division.
        Configuration Section.
            special-names. decimal-point is comma.
 
-      *>-----Declaração dos recursos externos
+      *>-----DeclaraÃ§Ã£o dos recursos externos
        Input-output Section.
        File-control.
        I-O-Control.
 
-      *>Declaração de variáveis
+      *>DeclaraÃ§Ã£o de variÃ¡veis
        Data Division.
 
       *>----Variaveis de arquivos
@@ -50,7 +48,6 @@
            05 ws-acertou                           pic 9(02)
                                                    value 1.
 
-
        01 ws-hora-inicio.
            05 ws-hor                               pic 9(002).
            05 ws-min                               pic 9(002).
@@ -62,19 +59,21 @@
            05 ws-seg-fim                           pic 9(002).
 
        01 ws-indices.
-          05 ws-aposta-ind                         pic 9(02)
+           05 ws-aposta-ind                        pic 9(02)
                                                    value 1.
-          05 ws-qnt-aposta-ind                     pic 9(02)
+           05 ws-qnt-aposta-ind                    pic 9(02)
                                                    value 1.
-          05 ws-ind-random                         pic 9(02).
-          05 ws-ind-acertos                        pic 9(02)
+           05 ws-ind-random                        pic 9(02).
+           05 ws-ind-acertos                       pic 9(02)
                                                    value 1.
-          05 ws-ind-comparar                       pic 9(02)
+           05 ws-ind-comparar                      pic 9(02)
                                                    value 0.
-          05 ws-ind-sorte                          pic 9(02)
+           05 ws-ind-sorte                         pic 9(02)
                                                    value 1.
-          05 ws-contador                           pic 9(04)
+           05 ws-contador                          pic 9(04)
                                                    value 0.
+           05 ws-ind-acertou                       pic 9(02).
+
 
        77 ws-diferenca-hr                          pic 9(02).
        77 ws-diferenca-min                         pic 9(02).
@@ -82,19 +81,20 @@
 
        77 ws-sair                                  pic x(02).
 
-       77  ws-menu                                 pic 9(02).
+       77 ws-menu                                  pic 9(02).
+
        linkage section.
 
 
-      *>----Declaração de tela
+      *>----DeclaraÃ§Ã£o de tela
        screen section.
 
-      *>É necessario relacionar as variaveis da Linkage section
+      *>Ã‰ necessario relacionar as variaveis da Linkage section
       *>para se tornarem acessiveis ao programa...
        procedure division.
 
 
-      *>É necessario relacionar as variaveis da Linkage section
+      *>Ã‰ necessario relacionar as variaveis da Linkage section
       *>para se tornarem acessiveis ao programa...
 
            perform inicializa.
@@ -108,10 +108,10 @@
        inicializa-exit.
            exit.
 
-      *>construçao do laço principal (menu) ou regra de negócio
+      *>construÃ§ao do laÃ§o principal (menu) ou regra de negÃ³cio
        processamento section.
 
-           *>função para saber a hora que inicia o jogo de aposta
+           *>funÃ§Ã£o para saber a hora que inicia o jogo de aposta
            move function current-date(9:6) to ws-hora-inicio
 
 
@@ -128,7 +128,6 @@
                display "'10' Apostar 10 numeros?  "
                accept ws-menu
                    if ws-menu >= 6 and ws-menu <= 10 then
-                       add 1  to ws-contador
                        perform aposta
                    else
                        display "opcao invalida"
@@ -136,7 +135,6 @@
 
                move 1  to ws-qnt-aposta-ind
 
-               display "'A'postar mais uma vez?"
                display "'S'air"
                accept ws-sair
            end-perform
@@ -154,52 +152,28 @@
                display "Informe sua aposta com numeros de 1 a 60: "
                accept ws-aposta-ind
                    if ws-aposta-ind > 0 and ws-aposta-ind <= 60 then
-                           move ws-aposta-ind to ws-aposta-informada(ws-qnt-aposta-ind)
-                           add 1 to ws-qnt-aposta-ind
+                       move ws-aposta-ind to ws-aposta-informada(ws-qnt-aposta-ind)
+                       add 1 to ws-qnt-aposta-ind
                    else
-                           display "Os numeros devem ser de 1 a 60, informe novamente: "
-                           accept ws-aposta-ind
+                       display "Os numeros devem ser de 1 a 60, informe novamente: "
+                       accept ws-aposta-ind
                    end-if
            end-perform
-      *>   chama o sorteio de números
+      *>   chama o sorteio de nÃºmeros
            perform sortear
 
            .
        aposta-exit.
            exit.
 
-      *>------------------------Numeros a serem sorteados------------------------------------
+      *>--------------------Atraso da semente - Delay---------------------------------------
 
-       sortear section.
-
-            move 1 to ws-ind-random
-            perform until ws-ind-random > 6
-               perform semente-delay
-               compute ws-num_random = function random(ws-semente) * 60
-
-               if  (ws-num_random > 0) and (ws-num_random <= 60)
-               and ws-num_random <> ws-numeros-sorteio(1)
-               and ws-num_random <> ws-numeros-sorteio(2)
-               and ws-num_random <> ws-numeros-sorteio(3)
-               and ws-num_random <> ws-numeros-sorteio(4)
-               and ws-num_random <> ws-numeros-sorteio(5)
-               and ws-num_random <> ws-numeros-sorteio(6) then
-                  move ws-num_random to ws-numeros-sorteio(ws-ind-random)
-                  add 1 to ws-ind-random
-               end-if
-            end-perform
-            *>chama section para comparar os numeros
-            perform comparar
-
-           .
-       sortear-exit.
-           exit.
-      *>---------------------Atraso da semente - Delay---------------------------------------
-
-       semente-delay section.  *> delay de 1 centésimo de segundo
+       semente-delay section.  *> delay de 1 centÃ©simo de segundo
            perform 10 times
+
                accept ws-semente1 from time
-               move ws-semente1    to ws-semente
+               move ws-semente1   to ws-semente
+
                perform until ws-semente > ws-semente1
                    accept ws-semente from time
                end-perform
@@ -208,61 +182,88 @@
        semente-delay-exit.
            exit.
 
-      *>----------------------Comparação entre os numeros -----------------------------------
+      *>--------------------Sorteia numeros aleatorios--------------------------------------
+       sortear section.
 
-       comparar section.
+           move 0  to ws-ind-acertou
 
-           perform varying ws-ind-comparar from 1 by 1 until ws-ind-comparar = 6
+           perform until ws-ind-acertou > 0
 
-               if ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(1) or
-                  ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(2) or
-                  ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(3) or
-                  ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(4) or
-                  ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(5) or
-                  ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(6) then
+               add  1 to ws-contador
+               move 1 to ws-ind-random
 
-                   move ws-aposta-informada(ws-ind-comparar) to ws-acertou(ws-ind-comparar)
+               perform until ws-ind-random > 6
+
+                   perform semente-delay
+
+                   compute ws-num_random = function random(ws-semente) * 60
+
+                   if  (ws-num_random > 0) and (ws-num_random <= 60)
+                   and ws-num_random <> ws-numeros-sorteio(1)
+                   and ws-num_random <> ws-numeros-sorteio(2)
+                   and ws-num_random <> ws-numeros-sorteio(3)
+                   and ws-num_random <> ws-numeros-sorteio(4)
+                   and ws-num_random <> ws-numeros-sorteio(5)
+                   and ws-num_random <> ws-numeros-sorteio(6) then
+                       move ws-num_random to ws-numeros-sorteio(ws-ind-random)
+                       add 1 to ws-ind-random
+                   end-if
+               end-perform
+
+      *>----------------------ComparaÃ§Ã£o entre os numeros -----------------------------------
+               perform varying ws-ind-comparar from 1 by 1 until ws-ind-comparar = 6
+
+                   if ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(1)
+                   or ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(2)
+                   or ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(3)
+                   or ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(4)
+                   or ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(5)
+                   or ws-aposta-informada(ws-ind-comparar) = ws-numeros-sorteio(6)then
+                      move ws-aposta-informada(ws-ind-comparar) to ws-acertou(ws-ind-comparar)
+                   end-if
+               end-perform
+
+      *>Tratamento para informar usuÃ¡rio
+               if  ws-acertou(1) = ws-numeros-sorteio(1)
+               and ws-acertou(2) = ws-numeros-sorteio(2)
+               and ws-acertou(3) = ws-numeros-sorteio(3)
+               and ws-acertou(4) = ws-numeros-sorteio(4)
+               and ws-acertou(5) = ws-numeros-sorteio(5)
+               and ws-acertou(6) = ws-numeros-sorteio(6) then
+                   display "Voce acertou, parabens!!"
+
+                   *>funÃ§Ã£o para saber a hora final apÃ³s ter acertado
+                   move function current-date(9:6) to ws-hora-final
+
+                   *>os numeros sorteados
+                   display "                       "
+                   display "Os numeros sorteados foram: "ws-numeros-sorteio(1)" "ws-numeros-sorteio(2)
+                           " "ws-numeros-sorteio(3)" "ws-numeros-sorteio(4)" "ws-numeros-sorteio(5)
+                           " "ws-numeros-sorteio(6)
+
+                   *>o tempo gasto para acertar
+                   perform tempo-gasto
+                   display "Voce levou "ws-diferenca-hr" hrs, "
+                   display ws-diferenca-min" min e "
+                   display ws-diferenca-seg" seg para acertar."
+
+                   *>qnt de apostas feitas atÃ© acertar
+                   display "                       "
+                   display "Voce apostou: " ws-contador " vezes atÃ© acertar"
+                   move 1 to ws-ind-acertou
+               else
+                   display "                       "
+                   display "Voce ainda nao acertou."
+                   display "Os numeros sorteados foram: "ws-numeros-sorteio(1)" "ws-numeros-sorteio(2)
+                           " "ws-numeros-sorteio(3)" "ws-numeros-sorteio(4)" "ws-numeros-sorteio(5)
+                           " "ws-numeros-sorteio(6)
+                   display "A aposta esta em: " ws-contador " vezes"
+                   display "                       "
                end-if
            end-perform
 
-      *>Tratamento para informar usuário
-           if  ws-acertou(1) = ws-numeros-sorteio(1)
-           and ws-acertou(2) = ws-numeros-sorteio(2)
-           and ws-acertou(3) = ws-numeros-sorteio(3)
-           and ws-acertou(4) = ws-numeros-sorteio(4)
-           and ws-acertou(5) = ws-numeros-sorteio(5)
-           and ws-acertou(6) = ws-numeros-sorteio(6) then
-
-               display "Voce acertou, parabens!!"
-               *>função para saber a hora final após ter acertado
-               move function current-date(9:6) to ws-hora-final
-               *>os numeros sorteados
-               display "                          "
-               display "Os numeros sorteados foram: "ws-numeros-sorteio(1)" "ws-numeros-sorteio(2)
-                       " "ws-numeros-sorteio(3)" "ws-numeros-sorteio(4)" "ws-numeros-sorteio(5)
-                       " "ws-numeros-sorteio(6)
-               *>o tempo gasto para acertar
-               perform tempo-gasto
-               display "Voce levou "ws-diferenca-hr" hrs, "
-               display ws-diferenca-min" min e "
-               display ws-diferenca-seg" seg para acertar."
-               *>qnt de apostas feitas até acertar
-               display "                          "
-               display "Você apostou: " ws-contador " vezes até acertar"
-
-           else
-
-               display "Voce errou, tente novamente"
-               display "                          "
-               display "Os numeros sorteados foram: "ws-numeros-sorteio(1)" "ws-numeros-sorteio(2)
-                       " "ws-numeros-sorteio(3)" "ws-numeros-sorteio(4)" "ws-numeros-sorteio(5)
-                       " "ws-numeros-sorteio(6)
-
-
-           end-if
-
            .
-       comparar-exit.
+       sortear-exit.
            exit.
 
       *>----------------------calculo do tempo gasto no jogo--------------------------------
@@ -279,18 +280,13 @@
 
       *>-------------------------------------------------------------------------------------
        finaliza section.
-           Stop run
+           display "Sistema finalizado."
+
+           stop run
+
            .
        finaliza-exit.
            exit.
-
-
-
-
-
-
-
-
 
 
 
